@@ -1,0 +1,472 @@
+<html xmlns="http://www.w3.org/1999/html">
+    <head>
+        <link href='http://fonts.googleapis.com/css?family=Nunito:300' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="bower_components/reveal.js/css/reveal.min.css">
+        <link rel="stylesheet" href="bower_components/highlightjs/styles/idea.css">
+        <link rel="stylesheet" href="assets/yelp_reveal.css">
+        <link rel="stylesheet" href="assets/presentation.css">
+
+        <!-- If the query includes 'print-pdf', use the PDF print sheet -->
+        <script>
+            document.write( '<link rel="stylesheet" href="bower_components/reveal.js/css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
+        </script>
+
+    </head>
+
+    <body>
+        <div class="reveal">
+            <div class="slides">
+                <section>
+                    <img src="assets/yelp_transparent.png">
+                    <h2>Performance Without Sacrificing Code Quality</h2>
+                </section>
+                <section>
+                    <h2>Ken Struys</h2>
+                    <ul>
+                        <li>Four years at Yelp</li>
+                        <li>homepage, signup, search of yelp.com</li>
+                        <li>Engineer Manager of Webcore</li>
+                    </ul>
+                </section>
+                <section>
+                    <h2>Yelp Dataset Challenge</h2>
+                    <ul>
+                        <li>&gt; 1 Million Reviews</li>
+                        <li>&gt; 50 Thousand Businesses</li>
+                        <li>&gt; 320 Thousand Business Attributes</li>
+                        <li>&gt; 350 Thousand Users</li>
+                        <li>and More!</li>
+                    </ul>
+                    <p>December 31, 2014 Deadline</p>
+                    <p style="font-size: 1.5em">$5,000 prize + $1,000 for publication + $500 for presenting*</p>
+                    <p>
+                        <a href="http://yelp.com/dataset_challenge">yelp.com/dataset_challenge</a>
+                    </p>
+                    <p>
+                        <span style="font-size: 0.5em;">*See full terms on website</span>
+                    </p>
+                </section>
+                <section>
+                    <h2>Today</h2>
+                    <ul>
+                        <li>Why performance matters</li>
+                        <li>What makes a web app performant</li>
+                        <li>Why code quality is important</li>
+                        <li>Performant high quality code at Yelp</li>
+                    </ul>
+                </section>
+                <section class="stack">
+                <section>
+                    <h2>Why Performance Matters</h2>
+                </section>
+                <section>
+                    <h2>Steve Souders</h2>
+                    <ul>
+                        <li>Pioneer of Frontend Performance</li>
+                        <li>A Backend engineer</li>
+                        <li>A Real Scientist</li>
+                        <li>Found the most common, serious issues and brought them to the public</li>
+                    </ul>
+                </section>
+                <section>
+                    <h2>Companies figured it out</h2>
+                    <ul>
+                        <li>Google</li>
+                        <ul>
+                            <li>Half a second delay for search caused a 20% drop in traffic</li>
+                        </ul>
+                        <li>Amazon</li>
+                        <ul>
+                            <li>Amazon found every 100ms of latency cost them 1% in sales</li>
+                        </ul>
+                    </ul>
+                </section>
+                <section>
+                    <h2>Performance is Gratifying</h2>
+                    <ul>
+                        <li>It can be measured</li>
+                        <li>It's easy (sometimes)</li>
+                        <li>Hardcore points</li>
+                    </ul>
+                </section>
+                <section>
+                    <h2>Performance is still manual</h2>
+                    <ul>
+                        <li>Hard to assert performance of a web app</li>
+                        <li>All engineers need to understand performance</li>
+                        <li>Any engineer can cause performance to degrade</li>
+                        <li>"Performance First"</li>
+                    </ul>
+                </section>
+                </section>
+                <section class="stack">
+                <section>
+                    <h2>What makes an web app performant?</h2>
+                </section>
+                <section>
+                    <h2>Your Education Helps</h2>
+                    <ul>
+                        <li>Apply a scientific method to performance</li>
+                        <li>Always start with low hanging fruit and make it better</li>
+                        <li>You need data, Don't just guess</li>
+                    </ul>
+                </section>
+                <section>
+                    <h2>Measuring web apps</h2>
+                    <img src="assets/waterfall.png">
+                </section>
+                <section>
+                    <h2>Slow DOMContentLoaded</h2>
+                    <ul>
+                        <li>One of many examples</li>
+                        <li>Users can't see anything yet</li>
+                        <li>When users see a blank screen, they bounce</li>
+                    </ul>
+                </section>
+                <section>
+                    <h2>Slow DOMContentLoaded</h2>
+<pre><code>
+    &lt;html&gt;
+        &lt;head&gt;
+            &lt;script src="http://yelp.com/main.js"&gt;&lt;/script&gt;
+        &lt;/head&gt;
+        &lt;body&gt;
+             &lt;div id=&quot;feature-a&quot;&gt; . . . &lt;/div&gt;
+             &lt;div id=&quot;feature-b&quot;&gt; . . . &lt;/div&gt;
+             &lt;div id=&quot;feature-c&quot;&gt; . . . &lt;/div&gt;
+        &lt;/body&gt;
+    &lt;/html&gt;
+</code></pre>
+                </section>
+                <section>
+                    <h2>Fix is Easy</h2>
+<pre><code>
+    &lt;html&gt;
+        &lt;head&gt;
+        &lt;/head&gt;
+        &lt;body&gt;
+            &lt;div id=&quot;feature-a&quot;&gt; . . . &lt;/div&gt;
+            &lt;div id=&quot;feature-b&quot;&gt; . . . &lt;/div&gt;
+            &lt;div id=&quot;feature-c&quot;&gt; . . . &lt;/div&gt;
+            &lt;script src="http://yelp.com/main.js"&gt;&lt;/script&gt;
+        &lt;/body&gt;
+    &lt;/html&gt;
+</code></pre>
+                </section>
+                <section>
+                    <h2>Other Performance Fixes</h2>
+                    <ul>
+                        <li>There's thousands of other issues</li>
+                        <li>... be scientific</li>
+                    </ul>
+                </section>
+                <section>
+                    <h2>Going Down The Wrong Path</h2>
+<pre><code>
+    for (var i = 0; i < arr.length; i++) {
+        arr[i];
+    }
+
+</code></pre>
+                </section>
+                <section>
+                    <h2>Make it Faster - Cache</h2>
+<pre><code>
+    for (var i = 0, length = arr.length; i < length; i++) {
+        arr[i];
+    }
+
+</code></pre>
+                </section>
+                <section>
+                    <h2>Faster! - Compare to 0</h2>
+<pre><code>
+    for (var i = arr.length - 1; i >= 0; i++) {
+        arr[i];
+    }
+
+</code></pre>
+                </section>
+                    <section>
+                    <h2>Faster!!! - Reduce Download</h2>
+<pre><code>
+    i = arr.length;
+    while(i--) {
+        arr[i];
+    }
+
+</code></pre>
+                    </section>
+                    <section>
+                        <img src="assets/when_i_do.jpg">
+                    </section>
+                    <section>
+                        <h2>Reality Check</h2>
+                        <ul>
+                            <li>~1-2% Difference (with thousands of iterations)</li>
+                            <li>Significant developer overhead</li>
+                            <li>Will cause bugs</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h2>Closure Compiler</h2>
+                        <ul>
+                            <li>Actual computer science</li>
+                            <li>JS to JS compiler</li>
+                            <li>Compiles to optimal code</li>
+                            <li>Minimal developer overheard</li>
+                        </ul>
+                    </section>
+                </section>
+                <section class="stack">
+                <section>
+                    <h2>Performant, Quality Code</h2>
+                </section>
+                <section>
+                    <h3>Make it work, then make it beautiful, then make it fast</h3>
+                    <p>Nathan Marz - creator of Storm</p>
+                </section>
+                <section>
+                    <h2>Make it work</h2>
+                    <p>Understand the problem and have a solution</p>
+                </section>
+                <section>
+                    <h2>Make it beautiful</h2>
+                    <p>Figure out the primitives that build your application</p>
+                </section>
+                <section>
+                    <h2>Make it fast</h2>
+                    <p>Optimize the primitives</p>
+                </section>
+                <section>
+                    <h2>Iterate</h2>
+                </section>
+                <section>
+                    <h2>Don't Start with Fast</h2>
+                    <ul>
+                        <li>Avoid highly optimized spaghetti</li>
+                        <li>Hard to read code is buggy</li>
+                        <li>Time spent fixing bugs = less time on performance</li>
+                    </ul>
+                </section>
+                </section>
+                <section class="stack">
+                <section>
+                    <h2>Let's Talk about Yelp</h2>
+                </section>
+                <section>
+                    <img style="height:98%" src="assets/yelp_screenshot.png">
+                </section>
+                <section>
+                    <h2>The Yelp Primary codebase</h2>
+                    <ul>
+                        <li>10 years of code</li>
+                        <li>&gt; 200 engineers</li>
+                        <li>138 Million uniques</li>
+                    </ul>
+                </section>
+                <section>
+                    <h2>We care about Performance</h2>
+                    <ul>
+                        <p>It's really hard to make yelp faster</p>
+                    </ul>
+                </section>
+                </section>
+                <section class="stack">
+                <section>
+                    <h2>Beautiful, Performant Code at Yelp</h2>
+                </section>
+                <section>
+                    <h2>Understand what's slow</h2>
+                    <ul>
+                        <li>Latency - 800ms</li>
+                        <li>Download - 11ms</li>
+                        <li>DOMContentLoaded - 100ms</li>
+                    </ul>
+                </section>
+                <section>
+                    <h2>Why is Latency High?</h2>
+                    <ul>
+                        <li>Routing/Misc (10%)</li>
+                        <li>Database queries (70%)</li>
+                        <li>HTML Rendering (20%)</li>
+                    </ul>
+                </section>
+                <section>
+                    <h2>Here's Some Code</h2>
+<pre><code>
+    def load_page(request):
+        user_id = get_user_id(request)
+        business = Business.get(request.param['biz_id'])
+        reviews = TopReviews.get(business.id, limit=10)
+
+        deal = get_yelp_deal(business)
+        yelp_ad = get_ad(business, reviews)
+        reservations = get_reservations(business)
+
+        return render_page('business_page',
+            business=business,
+            reviews=reviews,
+            deal=deal,
+            yelp_ad=yelp_ad,
+            reservations=reservations,
+        )
+</code></pre>
+                </section>
+                <section>
+                    <h2>What's Good About this Design?</h2>
+                    <ul>
+                        <li>Easy to follow</li>
+                        <li>Reasonably Performant</li>
+                        <li>Load Data Once</li>
+                    </ul>
+                </section>
+                <section>
+                    <h2>What's not Great?</h2>
+                    <ul>
+                        <li>Very Imperative</li>
+                        <li>Serial execution</li>
+                        <li>Order dependant</li>
+                    </ul>
+                </section>
+                <section>
+                    <h2>Make it beautiful</h2>
+                    <ul>
+                        <li>We need better primitives</li>
+                        <li>We currently have a lot of primitives</li>
+                        <li>business, review, deal, etc</li>
+                    </ul>
+                </section>
+                <section>
+                    <h2>A better Primitive: an HTTP request</h2>
+<pre class="fragment"><code>
+    GET /biz/123 HTTP/1.1
+    Cookie: user_id=567
+
+</code></pre>
+
+<pre class="fragment"><code>
+    HTTP/1.1 200 OK
+    &lt;html&gt;
+        &lt;head&gt;...&lt;/head&gt;
+        &lt;body&gt;
+        ...
+        &lt;/body&gt;
+    &lt;/html&gt;
+
+</code></pre>
+                </section>
+                <section>
+                    <h2>Apply the primitive</h2>
+<pre><code>
+    def load_page(request):
+        rendered_yelp_ad = ad_from_request(request)
+        rendered_deal = deal_from_request(request)
+        rendered_reservations = reservations_from_request(request)
+
+        return render_page('business_page',
+            rendered_deal,
+            rendered_yelp_ad,
+            rendered_reservations,
+        )
+
+
+</code></pre>
+                </section>
+                <section>
+                    <h2>What's Better about this Design?</h2>
+                    <ul>
+                        <li>No Dependencies</li>
+                        <li>Probably easier to test</li>
+                        <li>Order doesn't matter</li>
+                        <li>More Beautiful</li>
+                    </ul>
+                </section>
+                <section>
+                    <h2>What's not Great</h2>
+                    <ul>
+                        <li>Clearly not "Performance First"</li>
+                        <li>Reload data in every function</li>
+                    </ul>
+                </section>
+                <section>
+                    <h2>How can we make to beautiful fast?</h2>
+                    <p class="fragment">Order doesn't matter -> Execute in Parallel</p>
+                </section>
+                <section>
+                    <h2>Rendering Pipeline</h2>
+                    <p>
+                        <img style="height:80%;" src="assets/parallel%20execution.png">
+                    </p>
+                </section>
+                </section>
+                <section class="stack">
+                <section>
+                    <h2>How'd we do?</h2>
+                </section>
+                <section>
+                    <h2>Results</h2>
+                    <ul>
+                        <li class="fragment">Original Latency - 800ms</li>
+                        <li class="fragment">New Design Latency - 400ms</li>
+                        <li class="fragment">Lots of low hanging fruit</li>
+                    </ul>
+                </section>
+                <section>
+                    <h2>Design</h2>
+                    <ul>
+                        <li>Developers are happier</li>
+                        <li>Fewer bugs</li>
+                        <li>Easier to test</li>
+                        <li>New default is more performant</li>
+                    </ul>
+                </section>
+                <section>
+                    <h2>More Hardcore Engineering</h2>
+                    <ul>
+                        <li>Work, Beautiful, Fast</li>
+                        <li>Optimize low hanging fruit</li>
+                        <li>Be scientific</li>
+                    </ul>
+                </section>
+                </section>
+                <section>
+                    <h2>Resources</h2>
+                    <ul>
+                        <li>Steve Souder: <a href="http://stevesouders.com/">stevesouders.com</a></li>
+                        <li>Nathan Marz: <a href="http://nathanmarz.com/blog/suffering-oriented-programming.html">Suffering-oriented programming</a></li>
+                        <li>My Presentation: <a href="http://struys.github.io/uoft_fall_2014_presentation">struys.github.io/uoft_fall_2014_presentation</a></li>
+                        <li>I'm always happy to help - <a href="http://twitter.com/kenstruys">@kenstruys</a></li>
+                    </ul>
+                </section>
+                <section>
+                    <h2>I want to work with passionate people</h2>
+                    <p>We're hiring</p>
+                    <a href="http://yelp.com/careers">yelp.com/careers</a>
+                </section>
+            </div>
+        </div>
+
+        <script src="bower_components/jquery/jquery.min.js"></script>
+        <script src="bower_components/reveal.js/js/reveal.min.js"></script>
+        <script src="bower_components/highlightjs/highlight.pack.js"></script>
+        <script type="text/javascript">
+            $('section')
+                .attr('data-background', "assets/viewpage.png")
+
+            Reveal.initialize({
+                history: true,
+                transition: 'linear',
+                keyboard: {
+                    39: 'next',
+                    37: 'prev'
+                },
+                controls: false
+            });
+            hljs.initHighlightingOnLoad();
+
+            $('.slide-background').css('background-position', '50% 100%');
+        </script>
+    </body>
+
+</html>
